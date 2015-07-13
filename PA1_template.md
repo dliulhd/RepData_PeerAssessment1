@@ -291,8 +291,8 @@ for(i in 1:length(INTERVALS)) {
 
 ```r
 par(mfrow=c(2,1))
-plot(INTERVALS,Ave_interval_steps_WD,xlab="",ylab="average number of steps",main="Weekdays",type="l")
-plot(INTERVALS,Ave_interval_steps_WD,xlab="5-minute intervals",ylab="average number of steps",main="Weekends",type="l")
+plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
+plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
