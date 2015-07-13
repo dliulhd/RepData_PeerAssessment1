@@ -125,7 +125,7 @@ for(i in 1:length(INTERVALS)) {
 * Plotting the the average numbers of steps in specific 5-min intervals, against the intervals
 
 ```r
-plot(1:length(INTERVALS),Ave_interval_steps,type ="l",xlab = "5-minute intervals", ylab = "Average number of steps")
+plot(INTERVALS,Ave_interval_steps,type ="l",xlab = "5-minute intervals", ylab = "Average number of steps")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
@@ -290,17 +290,17 @@ for(i in 1:length(INTERVALS)) {
 
 
 ```r
-par(mfrow=c(2,1),mar=c(4,3,2,3),asp=0.6)
+par(mfrow=c(2,1),mar=c(4,5,2,1),asp=0.6)
 ```
 
 ```
-## Warning in par(mfrow = c(2, 1), mar = c(4, 3, 2, 3), asp = 0.6): "asp"
+## Warning in par(mfrow = c(2, 1), mar = c(4, 5, 2, 1), asp = 0.6): "asp"
 ## n'est pas un paramètre graphique
 ```
 
 ```r
-plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
-plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
+plot(INTERVALS,Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
+plot(INTERVALS,Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
