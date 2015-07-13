@@ -269,7 +269,7 @@ df_daily_statistics2
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-* Creating the vector indicating whether a row is Weekday or Weekend 
+* Creating the vector indicating whether each row is of Weekday or Weekend, and binding this vector with the data frame
 
 
 ```r
@@ -279,7 +279,7 @@ for(i in 1:length(Days)) {
   if(Days[i]=="Samedi" | Days[i]=="Dimanche") Days[i] <- "Weekend"
   else Days[i] <- "Weekday"
 }
-Days <- factor(Days)
+df_NoNA <- cbind(df_NoNA, "WD.or.WE"=factor(Days))
 
 Ave_interval_steps_WD <- Ave_interval_steps_WE <- vector(mode = "numeric", length = length(INTERVALS))
 for(i in 1:length(INTERVALS)) {
@@ -290,7 +290,15 @@ for(i in 1:length(INTERVALS)) {
 
 
 ```r
-par(mfrow=c(2,1))
+par(mfrow=c(2,1),mar=c(4,3,2,3),asp=0.6)
+```
+
+```
+## Warning in par(mfrow = c(2, 1), mar = c(4, 3, 2, 3), asp = 0.6): "asp"
+## n'est pas un paramètre graphique
+```
+
+```r
 plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
 plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
 ```
