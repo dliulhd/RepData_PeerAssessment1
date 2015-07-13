@@ -35,7 +35,7 @@ df_daily_statistics <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps 
 
 ```{r}
 cutting.points = seq(0, max(df_daily_statistics$Total_steps), length.out = 10)
-hist(df_daily_statistics$Total_steps,col = "lightblue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
+hist(df_daily_statistics$Total_steps, col = "lightblue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
 ```
 
 
@@ -49,6 +49,7 @@ print(df_daily_statistics)
 
 * Computing the average numbers of steps in specific 5-min intervals, averaged over all available days
 ```{r}
+
 INTERVALS <- seq(0,max(df$interval,na.rm = TRUE), by = 5)
 Ave_interval_steps <- vector(mode = "numeric", length = length(INTERVALS))
 for(i in 1:length(INTERVALS)) {
@@ -79,21 +80,38 @@ NAS <- is.na(df$steps) # Create a vector marking the location of NA's, where the
 sum(NAS) # Obtaining total number of TRUE's, ie, the total number of rows with NA in the data frame
 ```
 
-* Fill NA's with the average value of that 5-minute interval across all days
+* Fill NA's with the average value of that 5-minute interval across all days, and save the result in a new data frame named df_noNA
 
 ```{r}
 STP_NoNA <- df$steps
 
 for(i in 1:length(STP_NoNA)){
-  if(is.na(STP_NoNA[i])) STP_NoNA[i] <- Ave_interval_steps[df$interval[i]/5+1]
+  if(is.na(STP_NoNA[i]) & !is.nan(Ave_interval_steps[df$interval[i]/5+1] )) STP_NoNA[i] <- Ave_interval_steps[df$interval[i]/5+1]
 }
-print(STP_NoNA)
-print(df$steps)
+
+df_NoNA <- data.frame( steps = STP_NoNA, df[,2:3] )
 ```
 
+* Compute the total, average, and median values of the number of steps of each day
 
 ```{r}
-df_daily_statistics_NoNA <- df_daily_statistics[!is.nan(df_daily_statistics$average),]
+MEDIAN2 <- AVERAGE2 <- TOTAL_STEPS2 <- vector(mode = "numeric", length = length(LVS))
+
+for(i in 1:length(LVS)) { 
+  TOTAL_STEPS2[i] = sum(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
+  AVERAGE2[i] = mean(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
+  MEDIAN2[i] = median(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
+} # Calculating the total, average, and median values of number of steps taken every single day
+
+df_daily_statistics2 <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS2, Average = AVERAGE2, Median = MEDIAN2) # Group these results into a single data frame
+
+df_daily_statistics2
+```
+
+* Plot the histogram with filled-in missing values
+
+```{r}
+hist(TOTAL_STEPS2, col = "blue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
