@@ -182,7 +182,21 @@ for(i in 1:length(LVS)) {
   AVERAGE2[i] = mean(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
   MEDIAN2[i] = median(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
 } # Calculating the total, average, and median values of number of steps taken every single day
+```
 
+* Plot the histogram with filled-in missing values
+
+
+```r
+hist(TOTAL_STEPS2, col = "blue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
+
+
+* Organizing the results obtained with filled-in missing values into a data frame, and report the result
+
+```r
 df_daily_statistics2 <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS2, Average = AVERAGE2, Median = MEDIAN2) # Group these results into a single data frame
 
 df_daily_statistics2
@@ -253,13 +267,32 @@ df_daily_statistics2
 ## 61 2012-11-30    10766.19 37.3825996 34.11321
 ```
 
-* Plot the histogram with filled-in missing values
+## Are there differences in activity patterns between weekdays and weekends?
+
+* Creating the vector indicating whether a row is Weekday or Weekend 
 
 
 ```r
-hist(TOTAL_STEPS2, col = "blue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
+Days <- weekdays(as.Date(df_NoNA$date, "%Y-%m-%d"))
+
+for(i in 1:length(Days)) {
+  if(Days[i]=="Samedi" | Days[i]=="Dimanche") Days[i] <- "Weekend"
+  else Days[i] <- "Weekday"
+}
+Days <- factor(Days)
+
+Ave_interval_steps_WD <- Ave_interval_steps_WE <- vector(mode = "numeric", length = length(INTERVALS))
+for(i in 1:length(INTERVALS)) {
+  Ave_interval_steps_WD[i] <- mean( df_NoNA$steps[(df_NoNA$interval == INTERVALS[i])&(Days=="Weekday")] , na.rm = TRUE)
+  Ave_interval_steps_WE[i] <- mean( df_NoNA$steps[(df_NoNA$interval == INTERVALS[i])&(Days=="Weekend")] , na.rm = TRUE)
+}
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
 
-## Are there differences in activity patterns between weekdays and weekends?
+```r
+par(mfrow=c(2,1))
+plot(INTERVALS,Ave_interval_steps_WD,xlab="",ylab="average number of steps",main="Weekdays",type="l")
+plot(INTERVALS,Ave_interval_steps_WD,xlab="5-minute intervals",ylab="average number of steps",main="Weekends",type="l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 

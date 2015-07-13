@@ -102,10 +102,6 @@ for(i in 1:length(LVS)) {
   AVERAGE2[i] = mean(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
   MEDIAN2[i] = median(df_NoNA[df_NoNA$date == LVS[i],]$steps) 
 } # Calculating the total, average, and median values of number of steps taken every single day
-
-df_daily_statistics2 <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS2, Average = AVERAGE2, Median = MEDIAN2) # Group these results into a single data frame
-
-df_daily_statistics2
 ```
 
 * Plot the histogram with filled-in missing values
@@ -114,4 +110,36 @@ df_daily_statistics2
 hist(TOTAL_STEPS2, col = "blue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
 ```
 
+
+* Organizing the results obtained with filled-in missing values into a data frame, and report the result
+```{r}
+df_daily_statistics2 <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS2, Average = AVERAGE2, Median = MEDIAN2) # Group these results into a single data frame
+
+df_daily_statistics2
+```
+
 ## Are there differences in activity patterns between weekdays and weekends?
+
+* Creating the vector indicating whether a row is Weekday or Weekend 
+
+```{r}
+Days <- weekdays(as.Date(df_NoNA$date, "%Y-%m-%d"))
+
+for(i in 1:length(Days)) {
+  if(Days[i]=="Samedi" | Days[i]=="Dimanche") Days[i] <- "Weekend"
+  else Days[i] <- "Weekday"
+}
+Days <- factor(Days)
+
+Ave_interval_steps_WD <- Ave_interval_steps_WE <- vector(mode = "numeric", length = length(INTERVALS))
+for(i in 1:length(INTERVALS)) {
+  Ave_interval_steps_WD[i] <- mean( df_NoNA$steps[(df_NoNA$interval == INTERVALS[i])&(Days=="Weekday")] , na.rm = TRUE)
+  Ave_interval_steps_WE[i] <- mean( df_NoNA$steps[(df_NoNA$interval == INTERVALS[i])&(Days=="Weekend")] , na.rm = TRUE)
+}
+```
+
+```{r, fig.height=}
+par(mfrow=c(2,1))
+plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
+plot(1:length(INTERVALS),Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
+```
