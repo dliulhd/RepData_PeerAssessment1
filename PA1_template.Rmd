@@ -8,18 +8,59 @@ output:
 
 ## Loading and preprocessing the data
 
+```{r}
+unzip("activity.zip")
+df <- read.csv(unzip("activity.zip",list = TRUE)[1,1])
+df_REDUCE <- df[!is.na(df$steps),]
+LVS <- levels(df_REDUCE$date)
 
+MEDIAN <- AVERAGE <- TOTAL_STEPS <- vector(mode = "numeric", length = length(LVS))
+
+```
 
 ## What is mean total number of steps taken per day?
 
+* Calculating the total, average, and median values of number of steps taken every single day, and group them in one single data frame
+```{r, echo = "TRUE", output = "asis"}
+for(i in 1:length(LVS)) { 
+  TOTAL_STEPS[i] = sum(df_REDUCE[df_REDUCE$date == LVS[i],]$steps, na.rm = TRUE) 
+  AVERAGE[i] = mean(df_REDUCE[df_REDUCE$date == LVS[i],]$steps,na.rm = TRUE) 
+  MEDIAN[i] = median(df_REDUCE[df_REDUCE$date == LVS[i],]$steps, na.rm = TRUE) 
+} # Calculating the total, average, and median values of number of steps taken every single day
 
+df_daily_statistics <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS, Average = AVERAGE, Median = MEDIAN) # Group these results into a single data frame
+```
+
+* Histogram of daily total number of steps
+
+```{r}
+cutting.points = seq(0, max(df_daily_statistics$Total_steps), length.out = 10)
+hist(df_daily_statistics$Total_steps,col = "lightblue", xlab = "total number of steps each day", main = "Histogram of daily total number of steps",breaks= cutting.points)
+```
+
+
+* Reporting the results
+
+```{r}
+print(df_daily_statistics)
+```
 
 ## What is the average daily activity pattern?
 
-
+```{r}
+INTERVALS <- seq(0,max(df$interval,na.rm = TRUE), by = 5)
+Ave_interval_steps <- vector(mode = "numeric", length = length(INTERVALS))
+for(i in 1:length(INTERVALS)) {
+  Ave_interval_steps[i] <- mean( df$steps[df$interval == INTERVALS[i]] ,na.rm=TRUE)
+}
+plot(INTERVALS,Ave_interval_steps,type ="l",xlab = "5-minute intervals", ylab = "Average number of steps")
+```
 
 ## Imputing missing values
 
+```{r}
+df_daily_statistics_NoNA <- df_daily_statistics[!is.nan(df_daily_statistics$average),]
 
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
