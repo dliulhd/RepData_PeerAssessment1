@@ -8,20 +8,24 @@ output:
 
 ## Loading and preprocessing the data
 
+* Unzipping the zip data file, reading the resulting data file into "df", picking out only the rows without NA's of "df" and saving them in the data frame "df_REDUCE".
+
 ```{r}
 unzip("activity.zip")
 df <- read.csv(unzip("activity.zip",list = TRUE)[1,1])
 df_REDUCE <- df[!is.na(df$steps),]
-LVS <- levels(df_REDUCE$date)
-
-MEDIAN <- AVERAGE <- TOTAL_STEPS <- vector(mode = "numeric", length = length(LVS))
 
 ```
 
 ## What is mean total number of steps taken per day?
 
 * Calculating the total, average, and median values of number of steps taken every single day, and group them in one single data frame
-```{r, echo = "TRUE", output = "asis"}
+```{r, echo = "TRUE"}
+LVS <- levels(df_REDUCE$date) # Stocking all the different dates
+
+MEDIAN <- AVERAGE <- TOTAL_STEPS <- vector(mode = "numeric", length = length(LVS)) 
+# Creating vectors for stocking the median, average and total of the number of steps of each day. Note that these vectors are of the same length of that of LVS, the vector storing distinct dates
+
 for(i in 1:length(LVS)) { 
   TOTAL_STEPS[i] = sum(df_REDUCE[df_REDUCE$date == LVS[i],]$steps, na.rm = TRUE) 
   AVERAGE[i] = mean(df_REDUCE[df_REDUCE$date == LVS[i],]$steps,na.rm = TRUE) 
@@ -31,7 +35,7 @@ for(i in 1:length(LVS)) {
 df_daily_statistics <- data.frame(Dates = as.Date(LVS, "%Y-%m-%d"), Total_steps = TOTAL_STEPS, Average = AVERAGE, Median = MEDIAN) # Group these results into a single data frame
 ```
 
-* Histogram of daily total number of steps
+* Plotting histogram of daily total number of steps
 
 ```{r}
 cutting.points = seq(0, max(df_daily_statistics$Total_steps), length.out = 10)
@@ -39,7 +43,7 @@ hist(df_daily_statistics$Total_steps, col = "lightblue", xlab = "total number of
 ```
 
 
-* Reporting the results
+* Reporting the results of the total, average, and median of the number of steps each day
 
 ```{r}
 print(df_daily_statistics)
@@ -74,13 +78,14 @@ message("The 5-minute interval with maximum average number of steps is [",MAX_in
 
 ## Imputing missing values
 
+* Reporting the number of observations with missing value of "step"
 
 ```{r}
 NAS <- is.na(df$steps) # Create a vector marking the location of NA's, where the indices of TRUE's are the indices of the rows with missing step numbers (step = NA)
 sum(NAS) # Obtaining total number of TRUE's, ie, the total number of rows with NA in the data frame
 ```
 
-* Fill NA's with the average value of that 5-minute interval across all days, and save the result in a new data frame named df_noNA
+* Filling NA's with the average value of that 5-minute interval across all days, and save the result in a new data frame named df_noNA
 
 ```{r}
 STP_NoNA <- df$steps
@@ -92,7 +97,7 @@ for(i in 1:length(STP_NoNA)){
 df_NoNA <- data.frame( steps = STP_NoNA, df[,2:3] )
 ```
 
-* Compute the total, average, and median values of the number of steps of each day
+* Computing the total, average, and median values of the number of steps of each day using the data frame with missing data filled in
 
 ```{r}
 MEDIAN2 <- AVERAGE2 <- TOTAL_STEPS2 <- vector(mode = "numeric", length = length(LVS))
@@ -120,7 +125,7 @@ df_daily_statistics2
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-* Creating the vector indicating whether each row is of Weekday or Weekend, and binding this vector with the data frame
+* Creating the vector indicating whether each row is of Weekday or Weekend, and binding this vector with the data frame "df_NoNA", naming the new column "WD.or.WE"
 
 ```{r}
 Days <- weekdays(as.Date(df_NoNA$date, "%Y-%m-%d"))
@@ -130,7 +135,11 @@ for(i in 1:length(Days)) {
   else Days[i] <- "Weekday"
 }
 df_NoNA <- cbind(df_NoNA, "WD.or.WE"=factor(Days))
+```
 
+* Using the "WD.or.WE" column, computing the average number of steps of each 5-minutes intervals across weekdays and weekends, storing the results in "Ave_interval_steps_WD" and "Ave_interval_steps_WE" respectively
+
+```{r}
 Ave_interval_steps_WD <- Ave_interval_steps_WE <- vector(mode = "numeric", length = length(INTERVALS))
 for(i in 1:length(INTERVALS)) {
   Ave_interval_steps_WD[i] <- mean( df_NoNA$steps[(df_NoNA$interval == INTERVALS[i])&(Days=="Weekday")] , na.rm = TRUE)
@@ -138,8 +147,10 @@ for(i in 1:length(INTERVALS)) {
 }
 ```
 
+* Plotting the results in a 2x1-pannel, weekday result in the upper plot and weekend result in the lower plot 
+
 ```{r, fig.height=7}
-par(mfrow=c(2,1),mar=c(4,5,2,1),asp=0.6)
+par(mfrow=c(2,1),mar=c(4,5,2,1))
 plot(INTERVALS,Ave_interval_steps_WD,xlab="",ylab="Av. Num. of Steps",main="Weekdays",type="l")
-plot(INTERVALS,Ave_interval_steps_WD,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
+plot(INTERVALS,Ave_interval_steps_WE,xlab="5-minute intervals",ylab="Av. Num. of Steps",main="Weekends",type="l")
 ```
